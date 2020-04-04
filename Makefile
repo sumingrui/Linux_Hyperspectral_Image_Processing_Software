@@ -13,3 +13,9 @@ share.o: share.cc
 .PHONY : clean
 clean :
 	rm hsproc main.o bus.o share.o
+
+
+
+g++ share.cc bus.cc main.cc db/DBtools.cc db/hyperspectralDB.cc -std=c++11 -lconfig++ -lmysqlclient -o hsproc
+
+

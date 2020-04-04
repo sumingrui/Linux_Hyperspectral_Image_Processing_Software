@@ -8,15 +8,17 @@
 namespace HSIC
 {
 
+using std::string;
+
 struct AppConfig
 {
 	// database config
-	char hostName[64];
-	char account[20];
-	char passwd[20];
-	char db[20];
+	string hostName;
+	string account;
+	string passwd;
+	string db;
 	uint32_t port;
-	char dataPath[128];
+	string dataPath;
 
 	// algorithm config
 	int speed_level; // 1: slow  2:middle  3:fast
@@ -28,8 +30,9 @@ public:
 	Bus();
 	~Bus();
 	bool ReadAppConfig();
-	void MultiModule();
 	void ObjSearch();
+	int AddHSIEntry(string filename);
+	int DelHSIEntry(string filename);
 
 private:
 	AppConfig config_;

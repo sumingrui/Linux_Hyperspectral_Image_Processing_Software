@@ -25,9 +25,6 @@ struct hyperspectral_data_info
 typedef hyperspectral_data_info HINFO;
 
 int GetFilesInDir(string dbPath, std::vector<string> &ofiles);
-int DirPathExist(const string DirPath);
 int ReadConfig(string dbPath, string filename, HINFO &hinfo);
-
-string wstringToString(const std::wstring &wstr);
 
 #endif // DBTOOL_H_

@@ -1,8 +1,6 @@
-#include <io.h>
 #include <fstream>
-#include <iostream>
-#include <stdlib.h>
-#include <iomanip>
+#include <dirent.h>
+#include <string.h>
 
 #include "DBtools.h"
 #include "../share.h"
@@ -13,95 +11,34 @@ using std::string;
 using std::vector;
 using std::wstring;
 
-//wstring to string
-string wstringToString(const wstring &wstr)
-{
-    LPCWSTR pwszSrc = wstr.c_str();
-    int nLen = WideCharToMultiByte(CP_ACP, 0, pwszSrc, -1, NULL, 0, NULL, NULL);
-    if (nLen == 0)
-        return string("");
-
-    char *pszDst = new char[nLen];
-    if (!pszDst)
-        return string("");
-
-    WideCharToMultiByte(CP_ACP, 0, pwszSrc, -1, pszDst, nLen, NULL, NULL);
-    string str(pszDst);
-    delete[] pszDst;
-    pszDst = NULL;
-
-    return str;
-}
-
-//string to wstring
-wstring stringToWstring(const string &str)
-{
-    LPCSTR pszSrc = str.c_str();
-    int nLen = MultiByteToWideChar(CP_ACP, 0, pszSrc, -1, NULL, 0);
-    if (nLen == 0)
-        return wstring(L"");
-
-    wchar_t *pwszDst = new wchar_t[nLen];
-    if (!pwszDst)
-        return wstring(L"");
-
-    MultiByteToWideChar(CP_ACP, 0, pszSrc, -1, pwszDst, nLen);
-    wstring wstr(pwszDst);
-    delete[] pwszDst;
-    pwszDst = NULL;
-
-    return wstr;
-}
-
 int GetFilesInDir(string dbPath, vector<string> &ofiles)
 {
+    DIR *dirptr = NULL;
+    struct dirent *dirp;
 
-
-    
-}
-
-int GetFilesInDir(string dbPath, vector<string> &ofiles)
-{
-    if (!DirPathExist(dbPath))
+    //打开目录失败
+    if ((dirptr = opendir(dbPath.c_str())) == NULL)
     {
         return 0;
     }
 
-    wstring PostFix = L"*.raw";
-
-    HANDLE hFind;
-    WIN32_FIND_DATA data;
-
-    ofiles.clear();
-
-    wstring SearchName = stringToWstring(dbPath) + PostFix;
-
-    hFind = FindFirstFile(SearchName.c_str(), &data);
-    if (hFind != INVALID_HANDLE_VALUE)
+    while ((dirp = readdir(dirptr)) != NULL)
     {
-        do
+        //判断是否为文件以及文件后缀名
+        if ((dirp->d_type == DT_REG) && 0 == (strcmp(strchr(dirp->d_name, '.'), ".raw")))
         {
-            // add the path and file name together
-            string FileRoot = wstringToString(data.cFileName);
-            FileRoot = FileRoot.substr(0, FileRoot.length() - 4);
-            ofiles.push_back(FileRoot);
-        } while (FindNextFile(hFind, &data));
-        FindClose(hFind);
+            ofiles.push_back((string(dirp->d_name)).substr(0, string(dirp->d_name).length() - 4));
+        }
     }
-    return 1;
-}
+    closedir(dirptr);
 
-//检查DirPath是否存在
-int DirPathExist(const string DirPath)
-{
-    if (!_access(DirPath.c_str(), 0))
-        return 1;
-    return 0;
+    return 1;
 }
 
 //读取dci和hdr，填充数据库
 int ReadConfig(string dbPath, string filename, HINFO &hinfo)
 {
+
     string hinfo_dci = dbPath + filename + ".dci";
     string hinfo_hdr = dbPath + filename + ".hdr";
 
@@ -110,15 +47,15 @@ int ReadConfig(string dbPath, string filename, HINFO &hinfo)
     infile_hdr.open(hinfo_hdr, ios::in);
     if (!infile_dci.is_open() || !infile_hdr.is_open())
     {
-        log(error, "config file can not open: " + filename);
+        log(error, "Parameter file can not open: " + filename);
         return 0;
     }
     else
     {
         hinfo.filename = filename;
         char strDate[1024];
-        sprintf_s(strDate, 512, "%s-%s-%s %s:%s:%s", filename.substr(16, 4).c_str(), filename.substr(20, 2).c_str(), filename.substr(22, 2).c_str(),
-                  filename.substr(24, 2).c_str(), filename.substr(26, 2).c_str(), filename.substr(28).c_str());
+        snprintf(strDate, 512, "%s-%s-%s %s:%s:%s", filename.substr(16, 4).c_str(), filename.substr(20, 2).c_str(), filename.substr(22, 2).c_str(),
+                 filename.substr(24, 2).c_str(), filename.substr(26, 2).c_str(), filename.substr(28).c_str());
         hinfo.date = strDate;
         string line_dci;
 

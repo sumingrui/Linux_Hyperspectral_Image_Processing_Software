@@ -195,6 +195,8 @@ void HSIC::Bus::ObjSearch()
                     {
                         log(info, "create file: " + string(inev->name));
                         AddHSIEntry(string(inev->name));
+
+                        
                     }
                 }
 
@@ -218,16 +220,19 @@ int HSIC::Bus::AddHSIEntry(string filename)
 {
     // 先判断后缀
     string postfix = filename.substr(filename.length() - 3);
-    if (postfix == "raw" || postfix == "dci" || postfix == "hdr")
+    if (postfix == "raw")
     {
         string rootname = config_.dataPath + filename.substr(0, filename.length() - 4);
-        // raw,dci,hdr都存在添加
+        sleep(1);
         if (access((rootname + ".raw").c_str(), F_OK) == 0 &&
             access((rootname + ".dci").c_str(), F_OK) == 0 &&
             access((rootname + ".hdr").c_str(), F_OK) == 0)
         {
-            log(info, "Add entry " + rootname + " to database.");
-            return 1;
+            if (pHSIDB->InsertOneRow(filename.substr(0, filename.length() - 4)))
+            {
+                log(info, "Add entry " + rootname + " to database.");
+                return 1;
+            }
         }
         return 0;
     }
@@ -238,16 +243,17 @@ int HSIC::Bus::AddHSIEntry(string filename)
 int HSIC::Bus::DelHSIEntry(string filename)
 {
     string postfix = filename.substr(filename.length() - 3);
-    if (postfix == "raw" || postfix == "dci" || postfix == "hdr")
+    if (postfix == "raw")
     {
         string rootname = config_.dataPath + filename.substr(0, filename.length() - 4);
-        // raw,dci,hdr都删除了去除该条目
-        if (access((rootname + ".raw").c_str(), F_OK) == -1 &&
-            access((rootname + ".dci").c_str(), F_OK) == -1 &&
-            access((rootname + ".hdr").c_str(), F_OK) == -1)
+        // raw删除了去除该条目
+        if (access((rootname + ".raw").c_str(), F_OK) == -1)
         {
-            log(info, "Delete entry " + rootname + " from database.");
-            return 1;
+            if (pHSIDB->DeleteOneRow(filename.substr(0, filename.length() - 4)))
+            {
+                log(info, "Delete entry " + rootname + " from database.");
+                return 1;
+            }
         }
         return 0;
     }

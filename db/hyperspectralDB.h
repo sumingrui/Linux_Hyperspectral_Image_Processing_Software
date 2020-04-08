@@ -1,5 +1,5 @@
 // author: sumingrui
-// This is a database IO to hyperspectral images
+// This is a database IO to  images
 
 #ifndef HYPERSPECTRALDB_H_
 #define HYPERSPECTRALDB_H_

@@ -145,6 +145,9 @@ int SpectralDataSQL::ExportOneRow(string infile, string &outfile)
     }
 }
 
+// 查询数据
+
+
 string SpectralDataSQL::GetTaskfile()
 {
     return task_file_;

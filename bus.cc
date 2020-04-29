@@ -8,6 +8,7 @@
 
 #include "bus.h"
 #include "share.h"
+#include "taskscheduling.h"
 
 using namespace libconfig;
 
@@ -194,12 +195,12 @@ void HSIC::Bus::ObjSearch()
                     else if (inev->mask & IN_CREATE)
                     {
                         log(info, "create file: " + string(inev->name));
-                        AddHSIEntry(string(inev->name));
-
-                        
+                        if(AddHSIEntry(string(inev->name)))
+                        {
+                            AllocatingTask(string(inev->name));  
+                        }           
                     }
                 }
-
                 event_size = sizeof(*inev) + inev->len;
                 ret -= event_size;
                 event_pos += event_size;
@@ -223,7 +224,6 @@ int HSIC::Bus::AddHSIEntry(string filename)
     if (postfix == "raw")
     {
         string rootname = config_.dataPath + filename.substr(0, filename.length() - 4);
-        sleep(1);
         if (access((rootname + ".raw").c_str(), F_OK) == 0 &&
             access((rootname + ".dci").c_str(), F_OK) == 0 &&
             access((rootname + ".hdr").c_str(), F_OK) == 0)

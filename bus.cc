@@ -138,6 +138,24 @@ bool HSIC::Bus::ReadAppConfig()
         log(error, "No 'speed_level' setting in configuration file.");
     }
 
+    try
+    {
+        config_.useNUC = cfg.lookup("useNUC");
+    }
+    catch (const SettingNotFoundException &nfex)
+    {
+        log(error, "No 'useNUC' setting in configuration file.");
+    }
+
+    try
+    {
+        config_.XavierComputeRatio = cfg.lookup("XavierComputeRatio");
+    }
+    catch (const SettingNotFoundException &nfex)
+    {
+        log(error, "No 'XavierComputeRatio' setting in configuration file.");
+    }
+
     return (EXIT_SUCCESS);
 }
 
@@ -195,10 +213,16 @@ void HSIC::Bus::ObjSearch()
                     else if (inev->mask & IN_CREATE)
                     {
                         log(info, "create file: " + string(inev->name));
-                        if(AddHSIEntry(string(inev->name)))
+                        if (AddHSIEntry(string(inev->name)))
                         {
-                            AllocatingTask(string(inev->name));  
-                        }           
+                            //newrawSinglefile20190710142942.raw
+                            AllocatingTask(
+                                config_.dataPath, 
+                                string(inev->name),
+                                config_.useNUC,
+                                config_.XavierComputeRatio
+                                );
+                        }
                     }
                 }
                 event_size = sizeof(*inev) + inev->len;
@@ -219,22 +243,25 @@ void HSIC::Bus::ObjSearch()
 // 添加一个条目
 int HSIC::Bus::AddHSIEntry(string filename)
 {
-    // 先判断后缀
+    //判断后缀
     string postfix = filename.substr(filename.length() - 3);
     if (postfix == "raw")
     {
+        sleep(1);
         string rootname = config_.dataPath + filename.substr(0, filename.length() - 4);
         if (access((rootname + ".raw").c_str(), F_OK) == 0 &&
             access((rootname + ".dci").c_str(), F_OK) == 0 &&
             access((rootname + ".hdr").c_str(), F_OK) == 0)
         {
-            if (pHSIDB->InsertOneRow(filename.substr(0, filename.length() - 4)))
+            if (pHSIDB->QueryOneRow(filename.substr(0, filename.length() - 4)) == 0)
             {
-                log(info, "Add entry " + rootname + " to database.");
-                return 1;
+                if (pHSIDB->InsertOneRow(filename.substr(0, filename.length() - 4)))
+                {
+                    log(info, "Add entry " + rootname + " to database.");
+                    return 1;
+                }
             }
         }
-        return 0;
     }
     return 0;
 }

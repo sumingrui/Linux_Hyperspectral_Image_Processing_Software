@@ -22,35 +22,17 @@ class StubClient : public jsonrpc::Client
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
-        int dataTransfer(const std::string& data) throw (jsonrpc::JsonRpcException)
+        int exeAlgorithm(const std::string& algorithm, double computeRatio, const std::string& rawfile) //throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;
-            p["data"] = data;
-            Json::Value result = this->CallMethod("dataTransfer",p);
+            p["algorithm"] = algorithm;
+            p["computeRatio"] = computeRatio;
+            p["rawfile"] = rawfile;
+            Json::Value result = this->CallMethod("exeAlgorithm",p);
             if (result.isInt())
                 return result.asInt();
-            else
-                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
-        }
-        double requestRatio() throw (jsonrpc::JsonRpcException)
-        {
-            Json::Value p;
-            p = Json::nullValue;
-            Json::Value result = this->CallMethod("requestRatio",p);
-            if (result.isDouble())
-                return result.asDouble();
-            else
-                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
-        }
-        std::string requestResult(const std::string& data) throw (jsonrpc::JsonRpcException)
-        {
-            Json::Value p;
-            p["data"] = data;
-            Json::Value result = this->CallMethod("requestResult",p);
-            if (result.isString())
-                return result.asString();
-            else
-                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+            // else
+            //     throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
         int stopListening() throw (jsonrpc::JsonRpcException)
         {

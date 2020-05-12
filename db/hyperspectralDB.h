@@ -20,6 +20,7 @@ public:
 
     int Connect(const char *host, const char *user, const char *passwd, const char *db, unsigned int port); //返回值用int表示
     int Intialize();
+    int QueryOneRow(string filename);
     int InsertOneRow(string filename);
     int DeleteOneRow(string filename);
     int ExportOneRow(string infile, string &outfile);

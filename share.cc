@@ -34,7 +34,7 @@ void log(LOGLEVEL level, string content)
 
     FILE *logfile;
     std::unique_lock<std::mutex> locker(m_mutex);
-    logfile = fopen(("./result/" + logTimestamp + ".log").c_str(), "at+");
+    logfile = fopen(("./log/" + logTimestamp + ".log").c_str(), "at+");
     if (logfile != NULL)
     {
         char timeBuffer[20];

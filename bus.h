@@ -22,6 +22,8 @@ struct AppConfig
 
 	// algorithm config
 	int speed_level; // 1: slow  2:middle  3:fast
+	int useNUC;
+	double XavierComputeRatio;
 };
 
 class Bus

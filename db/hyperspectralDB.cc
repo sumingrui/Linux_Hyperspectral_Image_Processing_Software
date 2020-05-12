@@ -75,6 +75,30 @@ int SpectralDataSQL::Intialize()
     return 1;
 }
 
+// 查询数据
+int SpectralDataSQL::QueryOneRow(string filename)
+{
+    char sqlquery[1024];
+    snprintf(sqlquery, 512, "SELECT * FROM hyperspectral_data WHERE filename=\'%s\';", filename.c_str());
+    if (mysql_query(&hyperspectral_sql_, sqlquery))
+    {
+        log(error, string("Query data error: ") + filename + mysql_error(&hyperspectral_sql_));
+        return -1;
+    }
+    MYSQL_RES *res;
+    res = mysql_store_result(&hyperspectral_sql_);
+    int num = mysql_num_rows(res);
+    mysql_free_result(res);
+    if (num == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
 // 插入一行数据,filename: newrawSinglefile20190710142942
 int SpectralDataSQL::InsertOneRow(string filename)
 {
@@ -144,9 +168,6 @@ int SpectralDataSQL::ExportOneRow(string infile, string &outfile)
         return 1;
     }
 }
-
-// 查询数据
-
 
 string SpectralDataSQL::GetTaskfile()
 {

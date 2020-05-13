@@ -92,6 +92,7 @@ int GetXMLfile(string taskfile)
 void ExecuteTask(string path, string taskfile, int useNUC, double XavierComputeRatio)
 {
     HttpClient httpclient("http://192.168.137.2:8383");
+    httpclient.SetTimeout(30000L);
     StubClient c(httpclient);
     //1. Test connected
     if (c.sayHello() == "Server has Connected")
@@ -135,7 +136,7 @@ void ExecuteTask(string path, string taskfile, int useNUC, double XavierComputeR
             // use Xavier
             else
             {
-                if (c.exeAlgorithm("tf_2dcnn", 1, taskfile) == 1)
+                if (c.exeAlgorithm("tf_2dcnn", 1.0, taskfile) == 1)
                 {
                     log(info, "Execution algorithm succeed.");
                     time_t time_end;

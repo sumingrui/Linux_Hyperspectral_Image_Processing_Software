@@ -22,7 +22,7 @@ class StubClient : public jsonrpc::Client
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
-        int exeAlgorithm(const std::string& algorithm, double computeRatio, const std::string& rawfile) //throw (jsonrpc::JsonRpcException)
+        int exeAlgorithm(const std::string& algorithm, double computeRatio, const std::string& rawfile) throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;
             p["algorithm"] = algorithm;
@@ -31,8 +31,8 @@ class StubClient : public jsonrpc::Client
             Json::Value result = this->CallMethod("exeAlgorithm",p);
             if (result.isInt())
                 return result.asInt();
-            // else
-            //     throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
         int stopListening() throw (jsonrpc::JsonRpcException)
         {
